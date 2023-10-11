@@ -18,12 +18,13 @@ För att starta projektet följ dessa steg:
     npm run install-all
     ```
 
-4.  Detta kommer att bygga servern och starta den samt köra frontend-applikationen.
-    Starta projektet genom att köra följande kommando:
+4.  Starta projektet genom att köra följande kommando:
 
     ```bash
     npm run start
     ```
+
+    Detta kommer att bygga servern och starta den samt köra frontend-applikationen.
 
 5.  Öppna din webbläsare och navigera till http://localhost:3000 för att använda Admin UI. Om du vill se hur ditt innehåll visas i frontend, med standarddesignen från KeystoneJs, kan du öppna http://localhost:8000 i din webbläsare.
 
