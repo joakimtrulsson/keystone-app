@@ -1,0 +1,7 @@
+node_modules
+.keystone/admin
+keystone.db
+*.log
+public/event-images/*
+public/post-images/*
+public/images/*

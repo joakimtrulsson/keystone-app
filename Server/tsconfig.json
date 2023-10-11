@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "target": "esnext",
+    "module": "commonjs",
+    "strict": true,
+    "noEmit": true,
+    // "noEmit": false,
+    // "outDir": "./dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+    // "types": ["node"]
+  }
+}

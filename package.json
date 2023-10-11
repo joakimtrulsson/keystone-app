@@ -1,0 +1,18 @@
+{
+  "name": "keystone-app",
+  "version": "1.0.0",
+  "description": "A fullstack keystone example.",
+  "main": "none",
+  "scripts": {
+    "install-all": "npm install && concurrently --kill-others-on-fail \"cd frontend && npm install\" \"cd server && npm install\"",
+    "server-start": "cd server && npm run build && npm run start",
+    "frontend-start": "cd frontend && npm run dev",
+    "start": "concurrently \"npm run server-start\" \"wait-on http://localhost:3000 && npm run frontend-start\""
+  },
+  "author": "Joakim Trulsson",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^8.2.1",
+    "wait-on": "^7.0.1"
+  }
+}
