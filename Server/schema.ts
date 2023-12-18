@@ -1,7 +1,7 @@
 import type { Lists } from '.keystone/types';
 import type { Session } from './access';
 
-import { User, Role, Event, Chapter, Post } from './schemas/index';
+import { User, Role, Event, Chapter, Post, Image } from './schemas/index';
 
 export const lists: Lists<Session> = {
   Chapter,
@@ -9,4 +9,5 @@ export const lists: Lists<Session> = {
   Post,
   User,
   Role,
+  Image,
 };

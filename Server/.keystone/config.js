@@ -33,7 +33,7 @@ __export(keystone_exports, {
   default: () => keystone_default
 });
 module.exports = __toCommonJS(keystone_exports);
-var import_core7 = require("@keystone-6/core");
+var import_core12 = require("@keystone-6/core");
 var import_session = require("@keystone-6/core/session");
 var import_auth = require("@keystone-6/auth");
 var import_dotenv = __toESM(require("dotenv"));
@@ -329,18 +329,262 @@ var chapterSchema = (0, import_core3.list)({
 });
 
 // schemas/postSchema.ts
-var import_core5 = require("@keystone-6/core");
+var import_core9 = require("@keystone-6/core");
 var import_access7 = require("@keystone-6/core/access");
 var import_fields4 = require("@keystone-6/core/fields");
 var import_fields_document2 = require("@keystone-6/fields-document");
 
-// component-blocks/carousel.tsx
+// component-blocks/index.tsx
+var import_component_blocks3 = require("@keystone-6/fields-document/component-blocks");
+
+// component-blocks/ImageUploader/index.tsx
+var import_core5 = require("@keystone-ui/core");
+
+// component-blocks/ImageUploader/styles.ts
 var import_core4 = require("@keystone-ui/core");
+var container = (mode = "preview") => import_core4.css`
+  display: block;
+
+  ${mode === "preview" && import_core4.css`
+    padding: 16px;
+    border: 1px dotted #e2e8f0;
+    border-radius: 8px;
+  `}
+`;
+var inputWrapper = import_core4.css`
+  display: flex;
+  align-items: center;
+  margin-top: 16px;
+
+  label {
+    font-weight: 500;
+    margin-right: 8px;
+  }
+`;
+var textInput = import_core4.css`
+  width: 100%;
+  max-width: 450px;
+  padding: 6px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #334155;
+  transition: border-color 0.1s ease-in;
+
+  &:hover {
+    border-color: #93c5fd;
+  }
+
+  &:focus {
+    border-color: #3b82f6;
+  }
+`;
+var imageUploader = (isUploaded) => import_core4.css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 80px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.1s ease-in;
+
+  ${isUploaded && import_core4.css`
+    justify-content: flex-start;
+    height: auto;
+    border: 0;
+  `}
+
+  &:hover {
+    color: #3b82f6;
+    border-color: #93c5fd;
+  }
+
+  &:focus {
+    border-color: #3b82f6;
+  }
+`;
+var imagePreview = import_core4.css`
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  cursor: pointer;
+`;
+var styles_default = {
+  container,
+  inputWrapper,
+  textInput,
+  imageUploader,
+  imagePreview
+};
+
+// component-blocks/ImageUploader/useBase.tsx
+var import_react = require("react");
+var import_apollo = require("@keystone-6/core/admin-ui/apollo");
+var import_context = require("@keystone-6/core/admin-ui/context");
+var import_toast = require("@keystone-ui/toast");
+var useBase = ({
+  listKey,
+  defaultValue,
+  imageAlt,
+  onChange,
+  onImageAltChange,
+  onRelationChange
+}) => {
+  const [altText, setAltText] = (0, import_react.useState)(imageAlt ?? "");
+  const [imageSrc, setImageSrc] = (0, import_react.useState)(defaultValue?.image?.url ?? "");
+  const list7 = (0, import_context.useList)(listKey);
+  const toasts = (0, import_toast.useToasts)();
+  const UPLOAD_IMAGE = import_apollo.gql`
+    mutation ${list7.gqlNames.createMutationName}($file: Upload!) {
+      ${list7.gqlNames.createMutationName}(data: { image: { upload: $file } }) {
+        id, name, type, image { id, extension, filesize, height, width, url }
+      }
+    }
+  `;
+  const [uploadImage, { loading }] = (0, import_apollo.useMutation)(UPLOAD_IMAGE);
+  const uploadFile = (0, import_react.useCallback)(
+    async (file) => {
+      try {
+        return await uploadImage({
+          variables: { file }
+        });
+      } catch (err) {
+        toasts.addToast({
+          title: `Failed to upload file: ${file.name}`,
+          tone: "negative",
+          message: err.message
+        });
+      }
+      return null;
+    },
+    [toasts, uploadImage]
+  );
+  const handleAltTextChange = (0, import_react.useCallback)(
+    async (e) => {
+      const { value } = e.currentTarget;
+      setAltText(value);
+      onImageAltChange?.(value);
+    },
+    [onImageAltChange]
+  );
+  const handleUploadChange = (0, import_react.useCallback)(
+    async (e) => {
+      const selectedFile = e.currentTarget.files?.[0];
+      const src = selectedFile ? URL.createObjectURL(selectedFile) : "";
+      setImageSrc(src);
+      if (selectedFile) {
+        const result = await uploadFile(selectedFile);
+        const uploadedImage = result?.data?.createImage;
+        onChange?.({ id: uploadedImage.id });
+        if (onRelationChange) {
+          setTimeout(
+            () => onRelationChange({
+              id: uploadedImage.id,
+              label: uploadedImage.name,
+              data: uploadedImage
+            }),
+            0
+          );
+        }
+      }
+    },
+    [onChange, onRelationChange]
+  );
+  return {
+    altText,
+    imageSrc,
+    loading,
+    isShowLabel: !loading && !imageSrc,
+    isShowImage: !loading && !!imageSrc,
+    handleAltTextChange,
+    handleUploadChange
+  };
+};
+var useBase_default = useBase;
+
+// component-blocks/ImageUploader/index.tsx
+var ImageUploader = (props) => {
+  const {
+    altText,
+    imageSrc,
+    loading,
+    isShowLabel,
+    isShowImage,
+    handleAltTextChange,
+    handleUploadChange
+  } = useBase_default(props);
+  const { mode } = props;
+  return /* @__PURE__ */ (0, import_core5.jsx)("div", { css: styles_default.container(mode) }, /* @__PURE__ */ (0, import_core5.jsx)("label", { id: "file", css: styles_default.imageUploader(isShowImage) }, isShowLabel && /* @__PURE__ */ (0, import_core5.jsx)("span", null, "\u{1F5B1} Click to select a file..."), loading && /* @__PURE__ */ (0, import_core5.jsx)("span", null, "Loading..."), /* @__PURE__ */ (0, import_core5.jsx)(
+    "input",
+    {
+      autoComplete: "off",
+      type: "file",
+      accept: "image/*",
+      style: { display: "none" },
+      onChange: handleUploadChange
+    }
+  ), /* @__PURE__ */ (0, import_core5.jsx)(
+    "img",
+    {
+      src: imageSrc,
+      alt: altText,
+      css: styles_default.imagePreview,
+      style: { display: isShowImage ? "block" : "none" }
+    }
+  )), mode === "preview" && /* @__PURE__ */ (0, import_core5.jsx)("div", { css: styles_default.inputWrapper }, /* @__PURE__ */ (0, import_core5.jsx)("label", null, "Image Alt:"), /* @__PURE__ */ (0, import_core5.jsx)(
+    "input",
+    {
+      type: "text",
+      placeholder: "",
+      css: styles_default.textInput,
+      value: altText,
+      onChange: handleAltTextChange
+    }
+  )));
+};
+ImageUploader.defaultProps = {
+  defaultValue: null,
+  imageAlt: "",
+  mode: "preview"
+};
+
+// component-blocks/document-fields.tsx
+var import_react2 = __toESM(require("react"));
+var image3 = ({
+  listKey
+}) => {
+  return {
+    kind: "form",
+    Input({ value, onChange }) {
+      return /* @__PURE__ */ import_react2.default.createElement(
+        ImageUploader,
+        {
+          listKey,
+          defaultValue: value,
+          mode: "edit",
+          onChange
+        }
+      );
+    },
+    options: { listKey },
+    defaultValue: null,
+    validate(value) {
+      return typeof value === "object";
+    }
+  };
+};
+
+// component-blocks/carousel.tsx
+var import_core6 = require("@keystone-ui/core");
 var import_component_blocks = require("@keystone-6/fields-document/component-blocks");
 var carousel = (0, import_component_blocks.component)({
   label: "Carousel",
   preview: function Preview(props) {
-    return /* @__PURE__ */ (0, import_core4.jsx)(import_component_blocks.NotEditable, null, /* @__PURE__ */ (0, import_core4.jsx)(
+    return /* @__PURE__ */ (0, import_core6.jsx)(import_component_blocks.NotEditable, null, /* @__PURE__ */ (0, import_core6.jsx)(
       "div",
       {
         css: {
@@ -350,8 +594,8 @@ var carousel = (0, import_component_blocks.component)({
         }
       },
       props.fields.items.elements.map((item) => {
-        return /* @__PURE__ */ (0, import_core4.jsx)(
-          import_core4.Box,
+        return /* @__PURE__ */ (0, import_core6.jsx)(
+          import_core6.Box,
           {
             key: item.key,
             margin: "xsmall",
@@ -366,7 +610,7 @@ var carousel = (0, import_component_blocks.component)({
               background: "#eff3f6"
             }
           },
-          /* @__PURE__ */ (0, import_core4.jsx)(
+          /* @__PURE__ */ (0, import_core6.jsx)(
             "img",
             {
               role: "presentation",
@@ -380,7 +624,7 @@ var carousel = (0, import_component_blocks.component)({
               }
             }
           ),
-          /* @__PURE__ */ (0, import_core4.jsx)(
+          /* @__PURE__ */ (0, import_core6.jsx)(
             "h1",
             {
               css: {
@@ -410,13 +654,81 @@ var carousel = (0, import_component_blocks.component)({
   }
 });
 
+// component-blocks/hero.tsx
+var import_core7 = require("@keystone-ui/core");
+var import_component_blocks2 = require("@keystone-6/fields-document/component-blocks");
+var hero = (0, import_component_blocks2.component)({
+  label: "Hero",
+  schema: {
+    imageSrc: import_component_blocks2.fields.text({
+      label: "Image URL",
+      defaultValue: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809"
+    }),
+    caption: import_component_blocks2.fields.conditional(import_component_blocks2.fields.checkbox({ label: "Has caption" }), {
+      false: import_component_blocks2.fields.empty(),
+      true: import_component_blocks2.fields.child({
+        kind: "block",
+        placeholder: "Write a caption...",
+        formatting: "inherit",
+        links: "inherit"
+      })
+    })
+  },
+  preview: function Hero(props) {
+    return /* @__PURE__ */ (0, import_core7.jsx)("div", null, /* @__PURE__ */ (0, import_core7.jsx)(import_component_blocks2.NotEditable, null, /* @__PURE__ */ (0, import_core7.jsx)(
+      "div",
+      {
+        css: {
+          backgroundImage: `url(${props.fields.imageSrc.value})`,
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+          minHeight: 200,
+          width: "100%"
+        }
+      }
+    )), props.fields.caption.discriminant ? /* @__PURE__ */ (0, import_core7.jsx)("div", { css: { textAlign: "center" } }, props.fields.caption.value.element) : null);
+  }
+});
+
 // component-blocks/index.tsx
+var import_core8 = require("@keystone-ui/core");
 var componentBlocks = {
-  carousel
+  carousel,
+  hero,
+  /** Image */
+  image: (0, import_component_blocks3.component)({
+    preview: ({ fields: fields4 }) => /* @__PURE__ */ (0, import_core8.jsx)(import_component_blocks3.NotEditable, null, /* @__PURE__ */ (0, import_core8.jsx)(
+      ImageUploader,
+      {
+        listKey: fields4.image.options.listKey,
+        defaultValue: fields4.imageRel.value?.data,
+        imageAlt: fields4.imageAlt.value,
+        onChange: fields4.image.onChange,
+        onImageAltChange: fields4.imageAlt.onChange,
+        onRelationChange: fields4.imageRel.onChange
+      }
+    )),
+    label: "Image",
+    schema: {
+      imageAlt: import_component_blocks3.fields.text({
+        label: "Image Alt",
+        defaultValue: ""
+      }),
+      imageRel: import_component_blocks3.fields.relationship({
+        listKey: "Image",
+        label: "Image Relation",
+        selection: "id, image { width, height, url }"
+      }),
+      image: image3({
+        listKey: "Image"
+      })
+    },
+    chromeless: true
+  })
 };
 
 // schemas/postSchema.ts
-var postSchema = (0, import_core5.list)({
+var postSchema = (0, import_core9.list)({
   access: {
     operation: {
       ...(0, import_access7.allOperations)(isSignedIn),
@@ -478,10 +790,10 @@ var postSchema = (0, import_core5.list)({
 });
 
 // schemas/roleSchema.ts
-var import_core6 = require("@keystone-6/core");
+var import_core10 = require("@keystone-6/core");
 var import_access9 = require("@keystone-6/core/access");
 var import_fields5 = require("@keystone-6/core/fields");
-var roleSchema = (0, import_core6.list)({
+var roleSchema = (0, import_core10.list)({
   access: {
     operation: {
       ...(0, import_access9.allOperations)(permissions.canManageRoles),
@@ -518,13 +830,79 @@ var roleSchema = (0, import_core6.list)({
   }
 });
 
+// schemas/imageSchema.ts
+var import_core11 = require("@keystone-6/core");
+var import_access11 = require("@keystone-6/core/access");
+var import_fields7 = require("@keystone-6/core/fields");
+
+// component-blocks/ImageUploader/fields.tsx
+var import_fields6 = require("@keystone-6/core/fields");
+var imageStorageField = (0, import_fields6.image)({ storage: "heroImages" });
+var imageAltField = (0, import_fields6.text)({
+  defaultValue: "",
+  validation: { length: { max: 255 } }
+});
+
+// schemas/imageSchema.ts
+var imageSchema = (0, import_core11.list)({
+  access: {
+    operation: {
+      ...(0, import_access11.allOperations)(isSignedIn),
+      create: permissions.canCreateItems,
+      query: () => true
+    },
+    filter: {
+      query: rules.canReadItems,
+      update: rules.canReadItems,
+      // update: rules.canManageItems,
+      delete: rules.canManageItems
+    }
+  },
+  ui: {
+    listView: {
+      initialColumns: ["name", "type", "image"],
+      initialSort: { field: "name", direction: "ASC" }
+    }
+  },
+  /** Image */
+  fields: {
+    name: (0, import_fields7.text)({ defaultValue: "" }),
+    // Category, Page, Post, Document (from document editor)
+    type: (0, import_fields7.text)({ defaultValue: "Document" /* DOCUMENT */ }),
+    filename: (0, import_fields7.text)({
+      isIndexed: "unique",
+      db: { isNullable: true },
+      ui: { createView: { fieldMode: "hidden" }, itemView: { fieldMode: "read" } }
+    }),
+    image: imageStorageField
+  },
+  hooks: {
+    resolveInput: async ({ resolvedData, item }) => {
+      const { name, image: image7 } = resolvedData;
+      const imageId = image7.id ?? item?.image_id;
+      const imageExt = image7.extension ?? item?.image_extension;
+      const origFilename = typeof imageId === "string" ? imageId.split("-").slice(0, -1).join("-") : "unknown";
+      const filename = imageId ? `${imageId}.${imageExt}` : null;
+      if (name === "") {
+        return {
+          ...resolvedData,
+          name: origFilename || item?.name,
+          filename: filename || item?.filename
+        };
+      }
+      return { ...resolvedData, filename };
+    }
+  }
+});
+
 // schema.ts
 var lists = {
   Chapter: chapterSchema,
   Event: eventSchema,
   Post: postSchema,
   User: userSchema,
-  Role: roleSchema
+  Role: roleSchema,
+  Image: imageSchema
 };
 
 // routes/getEvents.ts
@@ -600,7 +978,7 @@ var { withAuth } = (0, import_auth.createAuth)({
     }`
 });
 var keystone_default = withAuth(
-  (0, import_core7.config)({
+  (0, import_core12.config)({
     db: {
       provider: "sqlite",
       url: process.env.DATABASE_URL || "file:./database.db"
@@ -624,6 +1002,15 @@ var keystone_default = withAuth(
           path: "/images"
         },
         storagePath: "public/event-images"
+      },
+      heroImages: {
+        kind: "local",
+        type: "image",
+        generateUrl: (path) => `${baseUrl}/hero-images${path}`,
+        serverRoute: {
+          path: "/hero-images"
+        },
+        storagePath: "public/hero-images"
       },
       postImages: {
         kind: "local",

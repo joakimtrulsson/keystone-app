@@ -3,10 +3,12 @@
   "version": "0.1.1",
   "license": "MIT",
   "scripts": {
-    "dev": "keystone dev",
-    "start": "keystone start",
     "build": "keystone build",
-    "postinstall": "keystone postinstall"
+    "dev": "keystone dev",
+    "postinstall": "keystone postinstall",
+    "generate": "keystone prisma migrate dev",
+    "start": "keystone start --with-migrations",
+    "deploy": "keystone build && keystone prisma migrate deploy"
   },
   "dependencies": {
     "@keystone-6/auth": "^7.0.0",

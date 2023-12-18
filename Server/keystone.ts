@@ -92,6 +92,15 @@ export default withAuth(
         },
         storagePath: 'public/event-images',
       },
+      heroImages: {
+        kind: 'local',
+        type: 'image',
+        generateUrl: (path) => `${baseUrl}/hero-images${path}`,
+        serverRoute: {
+          path: '/hero-images',
+        },
+        storagePath: 'public/hero-images',
+      },
       postImages: {
         kind: 'local',
         type: 'image',
@@ -99,7 +108,7 @@ export default withAuth(
         serverRoute: {
           path: '/post-images',
         },
-        storagePath: 'public/post-images', 
+        storagePath: 'public/post-images',
       },
     },
     ui: {
