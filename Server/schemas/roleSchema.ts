@@ -12,6 +12,11 @@ export const roleSchema = list({
     },
   },
   ui: {
+    isHidden: (args) => {
+      // Replace this with your own logic
+      // For example, you might check if the user has a certain role
+      return !permissions?.canManageRoles(args);
+    },
     hideCreate: (args) => !permissions.canManageRoles(args),
     hideDelete: (args) => !permissions.canManageRoles(args),
     listView: {

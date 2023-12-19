@@ -15,6 +15,11 @@ model Chapter {
   id                             String    @id @default(cuid())
   title                          String    @default("")
   desc                           String    @default("")
+  heroImage_filesize             Int?
+  heroImage_extension            String?
+  heroImage_width                Int?
+  heroImage_height               Int?
+  heroImage_id                   String?
   referencedChapter              Chapter[] @relation("Chapter_referencedChapter")
   events                         Event[]   @relation("Chapter_events")
   author                         User?     @relation("Chapter_author", fields: [authorId], references: [id])

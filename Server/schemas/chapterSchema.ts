@@ -1,6 +1,6 @@
 import { list } from '@keystone-6/core';
 import { allOperations } from '@keystone-6/core/access';
-import { relationship, text } from '@keystone-6/core/fields';
+import { relationship, text, image } from '@keystone-6/core/fields';
 // import { document } from '@keystone-6/fields-document';
 
 import { isSignedIn, permissions, rules } from '../access';
@@ -28,6 +28,7 @@ export const chapterSchema = list({
   fields: {
     title: text({ validation: { isRequired: true } }),
     desc: text({ validation: { isRequired: true } }),
+    heroImage: image({ storage: 'heroImages' }),
     referencedChapter: relationship({
       ref: 'Chapter',
       many: true,

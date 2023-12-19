@@ -5,11 +5,28 @@ type Chapter {
   id: ID!
   title: String
   desc: String
+  heroImage: ImageFieldOutput
   referencedChapter(where: ChapterWhereInput! = {}, orderBy: [ChapterOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ChapterWhereUniqueInput): [Chapter!]
   referencedChapterCount(where: ChapterWhereInput! = {}): Int
   events(where: EventWhereInput! = {}, orderBy: [EventOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: EventWhereUniqueInput): [Event!]
   eventsCount(where: EventWhereInput! = {}): Int
   author: User
+}
+
+type ImageFieldOutput {
+  id: ID!
+  filesize: Int!
+  width: Int!
+  height: Int!
+  extension: ImageExtension!
+  url: String!
+}
+
+enum ImageExtension {
+  jpg
+  png
+  webp
+  gif
 }
 
 input ChapterWhereUniqueInput {
@@ -93,10 +110,18 @@ enum OrderDirection {
 input ChapterUpdateInput {
   title: String
   desc: String
+  heroImage: ImageFieldInput
   referencedChapter: ChapterRelateToManyForUpdateInput
   events: EventRelateToManyForUpdateInput
   author: UserRelateToOneForUpdateInput
 }
+
+input ImageFieldInput {
+  upload: Upload!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 input ChapterRelateToManyForUpdateInput {
   disconnect: [ChapterWhereUniqueInput!]
@@ -126,6 +151,7 @@ input ChapterUpdateArgs {
 input ChapterCreateInput {
   title: String
   desc: String
+  heroImage: ImageFieldInput
   referencedChapter: ChapterRelateToManyForCreateInput
   events: EventRelateToManyForCreateInput
   author: UserRelateToOneForCreateInput
@@ -160,22 +186,6 @@ type Event {
 
 type Event_content_Document {
   document(hydrateRelationships: Boolean! = false): JSON!
-}
-
-type ImageFieldOutput {
-  id: ID!
-  filesize: Int!
-  width: Int!
-  height: Int!
-  extension: ImageExtension!
-  url: String!
-}
-
-enum ImageExtension {
-  jpg
-  png
-  webp
-  gif
 }
 
 scalar DateTime @specifiedBy(url: "https://datatracker.ietf.org/doc/html/rfc3339#section-5.6")
@@ -224,13 +234,6 @@ input EventUpdateInput {
   eventStartDate: DateTime
   author: UserRelateToOneForUpdateInput
 }
-
-input ImageFieldInput {
-  upload: Upload!
-}
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
 
 input EventUpdateArgs {
   where: EventWhereUniqueInput!

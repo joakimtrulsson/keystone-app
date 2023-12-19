@@ -100,6 +100,9 @@ var userSchema = (0, import_core.list)({
     }
   },
   ui: {
+    isHidden: (args) => {
+      return !permissions?.canManageRoles(args);
+    },
     hideCreate: (args) => !permissions.canManageUsers(args),
     hideDelete: (args) => !permissions.canManageUsers(args),
     listView: {
@@ -306,6 +309,7 @@ var chapterSchema = (0, import_core3.list)({
   fields: {
     title: (0, import_fields3.text)({ validation: { isRequired: true } }),
     desc: (0, import_fields3.text)({ validation: { isRequired: true } }),
+    heroImage: (0, import_fields3.image)({ storage: "heroImages" }),
     referencedChapter: (0, import_fields3.relationship)({
       ref: "Chapter",
       many: true,
@@ -583,7 +587,7 @@ ImageUploader.defaultProps = {
 
 // component-blocks/document-fields.tsx
 var import_react2 = __toESM(require("react"));
-var image2 = ({
+var image3 = ({
   listKey
 }) => {
   return {
@@ -748,7 +752,7 @@ var componentBlocks = {
         label: "Image Relation",
         selection: "id, image { width, height, url }"
       }),
-      image: image2({
+      image: image3({
         listKey: "Image"
       })
     },
@@ -830,6 +834,9 @@ var roleSchema = (0, import_core10.list)({
     }
   },
   ui: {
+    isHidden: (args) => {
+      return !permissions?.canManageRoles(args);
+    },
     hideCreate: (args) => !permissions.canManageRoles(args),
     hideDelete: (args) => !permissions.canManageRoles(args),
     listView: {
@@ -927,9 +934,9 @@ var imageSchema = (0, import_core11.list)({
   },
   hooks: {
     resolveInput: async ({ resolvedData, item }) => {
-      const { name, image: image6 } = resolvedData;
-      const imageId = image6.id ?? item?.image_id;
-      const imageExt = image6.extension ?? item?.image_extension;
+      const { name, image: image7 } = resolvedData;
+      const imageId = image7.id ?? item?.image_id;
+      const imageExt = image7.extension ?? item?.image_extension;
       const origFilename = typeof imageId === "string" ? imageId.split("-").slice(0, -1).join("-") : "unknown";
       const filename = imageId ? `${imageId}.${imageExt}` : null;
       if (name === "") {
