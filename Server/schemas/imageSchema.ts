@@ -39,6 +39,26 @@ export const imageSchema = list({
       ui: { createView: { fieldMode: 'hidden' }, itemView: { fieldMode: 'read' } },
     }),
     image: imageStorageField,
+    author: relationship({
+      ref: 'User.images',
+      ui: {
+        createView: {
+          fieldMode: (args) => (permissions.canManageAllItems(args) ? 'edit' : 'hidden'),
+        },
+        itemView: {
+          fieldMode: (args) => (permissions.canManageAllItems(args) ? 'edit' : 'read'),
+        },
+      },
+      hooks: {
+        resolveInput({ operation, resolvedData, context }) {
+          if (operation === 'create' && !resolvedData.author && context.session) {
+            // Nytt item länkas till användaren, detta är viktigt eftersom utan canManageAllItems syns inte det här fältet.
+            return { connect: { id: context.session.itemId } };
+          }
+          return resolvedData.author;
+        },
+      },
+    }),
   },
   hooks: {
     resolveInput: async ({ resolvedData, item }) => {

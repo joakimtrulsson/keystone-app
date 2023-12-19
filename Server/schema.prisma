@@ -12,12 +12,14 @@ generator client {
 }
 
 model Chapter {
-  id       String  @id @default(cuid())
-  title    String  @default("")
-  desc     String  @default("")
-  events   Event[] @relation("Chapter_events")
-  author   User?   @relation("Chapter_author", fields: [authorId], references: [id])
-  authorId String? @map("author")
+  id                             String    @id @default(cuid())
+  title                          String    @default("")
+  desc                           String    @default("")
+  referencedChapter              Chapter[] @relation("Chapter_referencedChapter")
+  events                         Event[]   @relation("Chapter_events")
+  author                         User?     @relation("Chapter_author", fields: [authorId], references: [id])
+  authorId                       String?   @map("author")
+  from_Chapter_referencedChapter Chapter[] @relation("Chapter_referencedChapter")
 
   @@index([authorId])
 }
@@ -65,6 +67,7 @@ model User {
   roleId   String?   @map("role")
   events   Event[]   @relation("Event_author")
   posts    Post[]    @relation("Post_author")
+  images   Image[]   @relation("Image_author")
   chapters Chapter[] @relation("Chapter_author")
 
   @@index([roleId])
@@ -81,6 +84,7 @@ model Role {
   canManageRoles    Boolean @default(false)
   canUseAdminUI     Boolean @default(false)
   canReadChapters   Boolean @default(false)
+  canReadImages     Boolean @default(false)
   author            User[]  @relation("User_role")
 }
 
@@ -94,4 +98,8 @@ model Image {
   image_width     Int?
   image_height    Int?
   image_id        String?
+  author          User?   @relation("Image_author", fields: [authorId], references: [id])
+  authorId        String? @map("author")
+
+  @@index([authorId])
 }

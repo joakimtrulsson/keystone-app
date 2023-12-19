@@ -181,6 +181,23 @@ var userSchema = (0, import_core.list)({
         itemView: { fieldMode: "read" }
       }
     }),
+    images: (0, import_fields.relationship)({
+      ref: "Image.author",
+      many: true,
+      access: {
+        // Du kan bara använda det här fältet om du har canMangaAllItems när du skapar en användare.
+        create: permissions.canManageAllItems,
+        // Du kan bara uppdatera det här fältet med canManageAllItems eller din egna användare.
+        update: ({ session, item }) => permissions.canManageAllItems({ session }) || session?.itemId === item.id
+      },
+      ui: {
+        createView: {
+          // Du kan bara se createview om du har canManageAllItems
+          fieldMode: (args) => permissions.canManageAllItems(args) ? "edit" : "hidden"
+        },
+        itemView: { fieldMode: "read" }
+      }
+    }),
     chapters: (0, import_fields.relationship)({
       ref: "Chapter.author",
       many: true,
@@ -289,6 +306,18 @@ var chapterSchema = (0, import_core3.list)({
   fields: {
     title: (0, import_fields3.text)({ validation: { isRequired: true } }),
     desc: (0, import_fields3.text)({ validation: { isRequired: true } }),
+    referencedChapter: (0, import_fields3.relationship)({
+      ref: "Chapter",
+      many: true,
+      ui: {
+        createView: {
+          fieldMode: (args) => permissions.canManageAllItems(args) ? "edit" : "hidden"
+        },
+        itemView: {
+          fieldMode: (args) => permissions.canManageAllItems(args) ? "edit" : "read"
+        }
+      }
+    }),
     events: (0, import_fields3.relationship)({
       ref: "Event.chapter",
       many: true,
@@ -554,7 +583,7 @@ ImageUploader.defaultProps = {
 
 // component-blocks/document-fields.tsx
 var import_react2 = __toESM(require("react"));
-var image3 = ({
+var image2 = ({
   listKey
 }) => {
   return {
@@ -719,7 +748,7 @@ var componentBlocks = {
         label: "Image Relation",
         selection: "id, image { width, height, url }"
       }),
-      image: image3({
+      image: image2({
         listKey: "Image"
       })
     },
@@ -820,6 +849,7 @@ var roleSchema = (0, import_core10.list)({
     canManageRoles: (0, import_fields5.checkbox)({ defaultValue: false }),
     canUseAdminUI: (0, import_fields5.checkbox)({ defaultValue: false }),
     canReadChapters: (0, import_fields5.checkbox)({ defaultValue: false }),
+    canReadImages: (0, import_fields5.checkbox)({ defaultValue: false }),
     author: (0, import_fields5.relationship)({
       ref: "User.role",
       many: true,
@@ -874,13 +904,32 @@ var imageSchema = (0, import_core11.list)({
       db: { isNullable: true },
       ui: { createView: { fieldMode: "hidden" }, itemView: { fieldMode: "read" } }
     }),
-    image: imageStorageField
+    image: imageStorageField,
+    author: (0, import_fields7.relationship)({
+      ref: "User.images",
+      ui: {
+        createView: {
+          fieldMode: (args) => permissions.canManageAllItems(args) ? "edit" : "hidden"
+        },
+        itemView: {
+          fieldMode: (args) => permissions.canManageAllItems(args) ? "edit" : "read"
+        }
+      },
+      hooks: {
+        resolveInput({ operation, resolvedData, context }) {
+          if (operation === "create" && !resolvedData.author && context.session) {
+            return { connect: { id: context.session.itemId } };
+          }
+          return resolvedData.author;
+        }
+      }
+    })
   },
   hooks: {
     resolveInput: async ({ resolvedData, item }) => {
-      const { name, image: image7 } = resolvedData;
-      const imageId = image7.id ?? item?.image_id;
-      const imageExt = image7.extension ?? item?.image_extension;
+      const { name, image: image6 } = resolvedData;
+      const imageId = image6.id ?? item?.image_id;
+      const imageExt = image6.extension ?? item?.image_extension;
       const origFilename = typeof imageId === "string" ? imageId.split("-").slice(0, -1).join("-") : "unknown";
       const filename = imageId ? `${imageId}.${imageExt}` : null;
       if (name === "") {

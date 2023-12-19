@@ -47,7 +47,8 @@ export const userSchema = list({
     password: password({
       access: {
         read: denyAll, // Event: is this required?
-        update: ({ session, item }) => permissions.canManageUsers({ session }) || session?.itemId === item.id,
+        update: ({ session, item }) =>
+          permissions.canManageUsers({ session }) || session?.itemId === item.id,
       },
       validation: { isRequired: true },
     }),
@@ -106,6 +107,28 @@ export const userSchema = list({
         itemView: { fieldMode: 'read' },
       },
     }),
+
+    images: relationship({
+      ref: 'Image.author',
+      many: true,
+      access: {
+        // Du kan bara använda det här fältet om du har canMangaAllItems när du skapar en användare.
+        create: permissions.canManageAllItems,
+
+        // Du kan bara uppdatera det här fältet med canManageAllItems eller din egna användare.
+        update: ({ session, item }) =>
+          permissions.canManageAllItems({ session }) || session?.itemId === item.id,
+      },
+      ui: {
+        createView: {
+          // Du kan bara se createview om du har canManageAllItems
+          fieldMode: (args) => (permissions.canManageAllItems(args) ? 'edit' : 'hidden'),
+        },
+
+        itemView: { fieldMode: 'read' },
+      },
+    }),
+
     chapters: relationship({
       ref: 'Chapter.author',
       many: true,

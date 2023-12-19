@@ -5,6 +5,8 @@ type Chapter {
   id: ID!
   title: String
   desc: String
+  referencedChapter(where: ChapterWhereInput! = {}, orderBy: [ChapterOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ChapterWhereUniqueInput): [Chapter!]
+  referencedChapterCount(where: ChapterWhereInput! = {}): Int
   events(where: EventWhereInput! = {}, orderBy: [EventOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: EventWhereUniqueInput): [Event!]
   eventsCount(where: EventWhereInput! = {}): Int
   author: User
@@ -21,6 +23,7 @@ input ChapterWhereInput {
   id: IDFilter
   title: StringFilter
   desc: StringFilter
+  referencedChapter: ChapterManyRelationFilter
   events: EventManyRelationFilter
   author: UserWhereInput
 }
@@ -64,6 +67,12 @@ input NestedStringFilter {
   not: NestedStringFilter
 }
 
+input ChapterManyRelationFilter {
+  every: ChapterWhereInput
+  some: ChapterWhereInput
+  none: ChapterWhereInput
+}
+
 input EventManyRelationFilter {
   every: EventWhereInput
   some: EventWhereInput
@@ -84,8 +93,16 @@ enum OrderDirection {
 input ChapterUpdateInput {
   title: String
   desc: String
+  referencedChapter: ChapterRelateToManyForUpdateInput
   events: EventRelateToManyForUpdateInput
   author: UserRelateToOneForUpdateInput
+}
+
+input ChapterRelateToManyForUpdateInput {
+  disconnect: [ChapterWhereUniqueInput!]
+  set: [ChapterWhereUniqueInput!]
+  create: [ChapterCreateInput!]
+  connect: [ChapterWhereUniqueInput!]
 }
 
 input EventRelateToManyForUpdateInput {
@@ -109,8 +126,14 @@ input ChapterUpdateArgs {
 input ChapterCreateInput {
   title: String
   desc: String
+  referencedChapter: ChapterRelateToManyForCreateInput
   events: EventRelateToManyForCreateInput
   author: UserRelateToOneForCreateInput
+}
+
+input ChapterRelateToManyForCreateInput {
+  create: [ChapterCreateInput!]
+  connect: [ChapterWhereUniqueInput!]
 }
 
 input EventRelateToManyForCreateInput {
@@ -174,12 +197,6 @@ input EventWhereInput {
   author: UserWhereInput
 }
 
-input ChapterManyRelationFilter {
-  every: ChapterWhereInput
-  some: ChapterWhereInput
-  none: ChapterWhereInput
-}
-
 input DateTimeNullableFilter {
   equals: DateTime
   in: [DateTime!]
@@ -208,13 +225,6 @@ input EventUpdateInput {
   author: UserRelateToOneForUpdateInput
 }
 
-input ChapterRelateToManyForUpdateInput {
-  disconnect: [ChapterWhereUniqueInput!]
-  set: [ChapterWhereUniqueInput!]
-  create: [ChapterCreateInput!]
-  connect: [ChapterWhereUniqueInput!]
-}
-
 input ImageFieldInput {
   upload: Upload!
 }
@@ -235,11 +245,6 @@ input EventCreateInput {
   eventImg: ImageFieldInput
   eventStartDate: DateTime
   author: UserRelateToOneForCreateInput
-}
-
-input ChapterRelateToManyForCreateInput {
-  create: [ChapterCreateInput!]
-  connect: [ChapterWhereUniqueInput!]
 }
 
 type Post {
@@ -311,6 +316,8 @@ type User {
   eventsCount(where: EventWhereInput! = {}): Int
   posts(where: PostWhereInput! = {}, orderBy: [PostOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: PostWhereUniqueInput): [Post!]
   postsCount(where: PostWhereInput! = {}): Int
+  images(where: ImageWhereInput! = {}, orderBy: [ImageOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ImageWhereUniqueInput): [Image!]
+  imagesCount(where: ImageWhereInput! = {}): Int
   chapters(where: ChapterWhereInput! = {}, orderBy: [ChapterOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ChapterWhereUniqueInput): [Chapter!]
   chaptersCount(where: ChapterWhereInput! = {}): Int
 }
@@ -331,6 +338,7 @@ input UserWhereInput {
   role: RoleWhereInput
   events: EventManyRelationFilter
   posts: PostManyRelationFilter
+  images: ImageManyRelationFilter
   chapters: ChapterManyRelationFilter
 }
 
@@ -338,6 +346,12 @@ input PostManyRelationFilter {
   every: PostWhereInput
   some: PostWhereInput
   none: PostWhereInput
+}
+
+input ImageManyRelationFilter {
+  every: ImageWhereInput
+  some: ImageWhereInput
+  none: ImageWhereInput
 }
 
 input UserOrderByInput {
@@ -350,6 +364,7 @@ input UserUpdateInput {
   role: RoleRelateToOneForUpdateInput
   events: EventRelateToManyForUpdateInput
   posts: PostRelateToManyForUpdateInput
+  images: ImageRelateToManyForUpdateInput
   chapters: ChapterRelateToManyForUpdateInput
 }
 
@@ -366,6 +381,13 @@ input PostRelateToManyForUpdateInput {
   connect: [PostWhereUniqueInput!]
 }
 
+input ImageRelateToManyForUpdateInput {
+  disconnect: [ImageWhereUniqueInput!]
+  set: [ImageWhereUniqueInput!]
+  create: [ImageCreateInput!]
+  connect: [ImageWhereUniqueInput!]
+}
+
 input UserUpdateArgs {
   where: UserWhereUniqueInput!
   data: UserUpdateInput!
@@ -377,6 +399,7 @@ input UserCreateInput {
   role: RoleRelateToOneForCreateInput
   events: EventRelateToManyForCreateInput
   posts: PostRelateToManyForCreateInput
+  images: ImageRelateToManyForCreateInput
   chapters: ChapterRelateToManyForCreateInput
 }
 
@@ -390,6 +413,11 @@ input PostRelateToManyForCreateInput {
   connect: [PostWhereUniqueInput!]
 }
 
+input ImageRelateToManyForCreateInput {
+  create: [ImageCreateInput!]
+  connect: [ImageWhereUniqueInput!]
+}
+
 type Role {
   id: ID!
   name: String
@@ -401,6 +429,7 @@ type Role {
   canManageRoles: Boolean
   canUseAdminUI: Boolean
   canReadChapters: Boolean
+  canReadImages: Boolean
   author(where: UserWhereInput! = {}, orderBy: [UserOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: UserWhereUniqueInput): [User!]
   authorCount(where: UserWhereInput! = {}): Int
 }
@@ -423,6 +452,7 @@ input RoleWhereInput {
   canManageRoles: BooleanFilter
   canUseAdminUI: BooleanFilter
   canReadChapters: BooleanFilter
+  canReadImages: BooleanFilter
   author: UserManyRelationFilter
 }
 
@@ -448,6 +478,7 @@ input RoleOrderByInput {
   canManageRoles: OrderDirection
   canUseAdminUI: OrderDirection
   canReadChapters: OrderDirection
+  canReadImages: OrderDirection
 }
 
 input RoleUpdateInput {
@@ -460,6 +491,7 @@ input RoleUpdateInput {
   canManageRoles: Boolean
   canUseAdminUI: Boolean
   canReadChapters: Boolean
+  canReadImages: Boolean
   author: UserRelateToManyForUpdateInput
 }
 
@@ -485,6 +517,7 @@ input RoleCreateInput {
   canManageRoles: Boolean
   canUseAdminUI: Boolean
   canReadChapters: Boolean
+  canReadImages: Boolean
   author: UserRelateToManyForCreateInput
 }
 
@@ -499,6 +532,7 @@ type Image {
   type: String
   filename: String
   image: ImageFieldOutput
+  author: User
 }
 
 input ImageWhereUniqueInput {
@@ -514,6 +548,7 @@ input ImageWhereInput {
   name: StringFilter
   type: StringFilter
   filename: StringNullableFilter
+  author: UserWhereInput
 }
 
 input StringNullableFilter {
@@ -542,6 +577,7 @@ input ImageUpdateInput {
   type: String
   filename: String
   image: ImageFieldInput
+  author: UserRelateToOneForUpdateInput
 }
 
 input ImageUpdateArgs {
@@ -554,6 +590,7 @@ input ImageCreateInput {
   type: String
   filename: String
   image: ImageFieldInput
+  author: UserRelateToOneForCreateInput
 }
 
 """

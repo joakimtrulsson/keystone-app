@@ -1,11 +1,9 @@
 import { list } from '@keystone-6/core';
-import { allOperations, denyAll } from '@keystone-6/core/access';
-import { checkbox, password, relationship, text, timestamp, image } from '@keystone-6/core/fields';
-import { document } from '@keystone-6/fields-document';
+import { allOperations } from '@keystone-6/core/access';
+import { relationship, text } from '@keystone-6/core/fields';
+// import { document } from '@keystone-6/fields-document';
 
 import { isSignedIn, permissions, rules } from '../access';
-import type { Session } from '../access';
-import type { Lists } from '.keystone/types';
 
 export const chapterSchema = list({
   access: {
@@ -30,6 +28,18 @@ export const chapterSchema = list({
   fields: {
     title: text({ validation: { isRequired: true } }),
     desc: text({ validation: { isRequired: true } }),
+    referencedChapter: relationship({
+      ref: 'Chapter',
+      many: true,
+      ui: {
+        createView: {
+          fieldMode: (args) => (permissions.canManageAllItems(args) ? 'edit' : 'hidden'),
+        },
+        itemView: {
+          fieldMode: (args) => (permissions.canManageAllItems(args) ? 'edit' : 'read'),
+        },
+      },
+    }),
     events: relationship({
       ref: 'Event.chapter',
       many: true,

@@ -40,6 +40,8 @@ export const roleSchema = list({
 
     canReadChapters: checkbox({ defaultValue: false }),
 
+    canReadImages: checkbox({ defaultValue: false }),
+
     author: relationship({
       ref: 'User.role',
       many: true,
