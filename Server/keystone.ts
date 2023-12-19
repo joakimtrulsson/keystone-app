@@ -110,6 +110,15 @@ export default withAuth(
         },
         storagePath: 'public/post-images',
       },
+      sectionImages: {
+        kind: 'local',
+        type: 'image',
+        generateUrl: (path) => `${baseUrl}/section-images${path}`,
+        serverRoute: {
+          path: '/section-images',
+        },
+        storagePath: 'public/section-images',
+      },
     },
     ui: {
       isAccessAllowed: ({ session }) => {

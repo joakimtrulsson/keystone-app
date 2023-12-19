@@ -5,6 +5,8 @@ import { relationship, text, image } from '@keystone-6/core/fields';
 
 import { isSignedIn, permissions, rules } from '../access';
 
+import buildSlug from '../utils/buildSlug';
+
 export const chapterSchema = list({
   access: {
     operation: {
@@ -60,6 +62,19 @@ export const chapterSchema = list({
       },
     }),
 
+    sections: relationship({
+      ref: 'Section',
+      many: true,
+      ui: {
+        createView: {
+          fieldMode: (args) => (permissions.canManageAllItems(args) ? 'edit' : 'hidden'),
+        },
+        itemView: {
+          fieldMode: (args) => (permissions.canManageAllItems(args) ? 'edit' : 'read'),
+        },
+      },
+    }),
+
     author: relationship({
       ref: 'User.chapters',
       ui: {
@@ -81,5 +96,33 @@ export const chapterSchema = list({
         },
       },
     }),
+    // slugTest: {
+    //   // type: Virtual,
+    //   resolver: item => `${item.name}-${item.id}`
+    //   }
+    // },
+    // slug: text({
+    //   // Being a slug, it should be indexed for lookups and unique
+    //   // isIndexed: 'unique',
+
+    //   // Define the hook function itself and attach it to the resolveInput
+    //   // step of the mutation lifecycle
+    //   hooks: {
+    //     resolveInput: ({ operation, resolvedData, inputData }) => {
+    //       // Lets only default the slug value on create and only if
+    //       // it isn't supplied by the caller.
+    //       // We probably don't want slugs to change automatically if an
+    //       // item is renamed.
+    //       console.log(resolvedData);
+    //       if (operation === 'update' && !inputData.slug) {
+    //         return buildSlug(inputData.title);
+    //       }
+
+    //       // Since this hook is a the field level we only return the
+    //       // value for this field, not the whole item
+    //       return resolvedData.slug;
+    //     },
+    //   },
+    // }),
   },
 });

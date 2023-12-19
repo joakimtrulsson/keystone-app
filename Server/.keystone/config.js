@@ -33,7 +33,7 @@ __export(keystone_exports, {
   default: () => keystone_default
 });
 module.exports = __toCommonJS(keystone_exports);
-var import_core12 = require("@keystone-6/core");
+var import_core13 = require("@keystone-6/core");
 var import_session = require("@keystone-6/core/session");
 var import_auth = require("@keystone-6/auth");
 var import_dotenv = __toESM(require("dotenv"));
@@ -339,6 +339,18 @@ var chapterSchema = (0, import_core3.list)({
         }
       }
     }),
+    sections: (0, import_fields3.relationship)({
+      ref: "Section",
+      many: true,
+      ui: {
+        createView: {
+          fieldMode: (args) => permissions.canManageAllItems(args) ? "edit" : "hidden"
+        },
+        itemView: {
+          fieldMode: (args) => permissions.canManageAllItems(args) ? "edit" : "read"
+        }
+      }
+    }),
     author: (0, import_fields3.relationship)({
       ref: "User.chapters",
       ui: {
@@ -358,6 +370,32 @@ var chapterSchema = (0, import_core3.list)({
         }
       }
     })
+    // slugTest: {
+    //   // type: Virtual,
+    //   resolver: item => `${item.name}-${item.id}`
+    //   }
+    // },
+    // slug: text({
+    //   // Being a slug, it should be indexed for lookups and unique
+    //   // isIndexed: 'unique',
+    //   // Define the hook function itself and attach it to the resolveInput
+    //   // step of the mutation lifecycle
+    //   hooks: {
+    //     resolveInput: ({ operation, resolvedData, inputData }) => {
+    //       // Lets only default the slug value on create and only if
+    //       // it isn't supplied by the caller.
+    //       // We probably don't want slugs to change automatically if an
+    //       // item is renamed.
+    //       console.log(resolvedData);
+    //       if (operation === 'update' && !inputData.slug) {
+    //         return buildSlug(inputData.title);
+    //       }
+    //       // Since this hook is a the field level we only return the
+    //       // value for this field, not the whole item
+    //       return resolvedData.slug;
+    //     },
+    //   },
+    // }),
   }
 });
 
@@ -469,11 +507,11 @@ var useBase = ({
 }) => {
   const [altText, setAltText] = (0, import_react.useState)(imageAlt ?? "");
   const [imageSrc, setImageSrc] = (0, import_react.useState)(defaultValue?.image?.url ?? "");
-  const list7 = (0, import_context.useList)(listKey);
+  const list8 = (0, import_context.useList)(listKey);
   const toasts = (0, import_toast.useToasts)();
   const UPLOAD_IMAGE = import_apollo.gql`
-    mutation ${list7.gqlNames.createMutationName}($file: Upload!) {
-      ${list7.gqlNames.createMutationName}(data: { image: { upload: $file } }) {
+    mutation ${list8.gqlNames.createMutationName}($file: Upload!) {
+      ${list8.gqlNames.createMutationName}(data: { image: { upload: $file } }) {
         id, name, type, image { id, extension, filesize, height, width, url }
       }
     }
@@ -934,9 +972,9 @@ var imageSchema = (0, import_core11.list)({
   },
   hooks: {
     resolveInput: async ({ resolvedData, item }) => {
-      const { name, image: image7 } = resolvedData;
-      const imageId = image7.id ?? item?.image_id;
-      const imageExt = image7.extension ?? item?.image_extension;
+      const { name, image: image8 } = resolvedData;
+      const imageId = image8.id ?? item?.image_id;
+      const imageExt = image8.extension ?? item?.image_extension;
       const origFilename = typeof imageId === "string" ? imageId.split("-").slice(0, -1).join("-") : "unknown";
       const filename = imageId ? `${imageId}.${imageExt}` : null;
       if (name === "") {
@@ -951,6 +989,31 @@ var imageSchema = (0, import_core11.list)({
   }
 });
 
+// schemas/sectionSchema.ts
+var import_core12 = require("@keystone-6/core");
+var import_fields9 = require("@keystone-6/core/fields");
+var import_access13 = require("@keystone-6/core/access");
+var sectionSchema = (0, import_core12.list)({
+  access: {
+    operation: {
+      ...(0, import_access13.allOperations)(isSignedIn),
+      create: permissions.canCreateItems,
+      query: () => true
+    },
+    filter: {
+      query: () => true,
+      // query: rules.canReadItems,
+      update: rules.canManageItems,
+      delete: rules.canManageItems
+    }
+  },
+  fields: {
+    title: (0, import_fields9.text)({ validation: { isRequired: true } }),
+    text: (0, import_fields9.text)({ validation: { isRequired: true } }),
+    image: (0, import_fields9.image)({ storage: "sectionImages" })
+  }
+});
+
 // schema.ts
 var lists = {
   Chapter: chapterSchema,
@@ -958,7 +1021,8 @@ var lists = {
   Post: postSchema,
   User: userSchema,
   Role: roleSchema,
-  Image: imageSchema
+  Image: imageSchema,
+  Section: sectionSchema
 };
 
 // routes/getEvents.ts
@@ -1034,7 +1098,7 @@ var { withAuth } = (0, import_auth.createAuth)({
     }`
 });
 var keystone_default = withAuth(
-  (0, import_core12.config)({
+  (0, import_core13.config)({
     db: {
       provider: "sqlite",
       url: process.env.DATABASE_URL || "file:./database.db"
@@ -1076,6 +1140,15 @@ var keystone_default = withAuth(
           path: "/post-images"
         },
         storagePath: "public/post-images"
+      },
+      sectionImages: {
+        kind: "local",
+        type: "image",
+        generateUrl: (path) => `${baseUrl}/section-images${path}`,
+        serverRoute: {
+          path: "/section-images"
+        },
+        storagePath: "public/section-images"
       }
     },
     ui: {

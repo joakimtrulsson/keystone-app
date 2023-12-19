@@ -10,6 +10,8 @@ type Chapter {
   referencedChapterCount(where: ChapterWhereInput! = {}): Int
   events(where: EventWhereInput! = {}, orderBy: [EventOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: EventWhereUniqueInput): [Event!]
   eventsCount(where: EventWhereInput! = {}): Int
+  sections(where: SectionWhereInput! = {}, orderBy: [SectionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SectionWhereUniqueInput): [Section!]
+  sectionsCount(where: SectionWhereInput! = {}): Int
   author: User
 }
 
@@ -42,6 +44,7 @@ input ChapterWhereInput {
   desc: StringFilter
   referencedChapter: ChapterManyRelationFilter
   events: EventManyRelationFilter
+  sections: SectionManyRelationFilter
   author: UserWhereInput
 }
 
@@ -96,6 +99,12 @@ input EventManyRelationFilter {
   none: EventWhereInput
 }
 
+input SectionManyRelationFilter {
+  every: SectionWhereInput
+  some: SectionWhereInput
+  none: SectionWhereInput
+}
+
 input ChapterOrderByInput {
   id: OrderDirection
   title: OrderDirection
@@ -113,6 +122,7 @@ input ChapterUpdateInput {
   heroImage: ImageFieldInput
   referencedChapter: ChapterRelateToManyForUpdateInput
   events: EventRelateToManyForUpdateInput
+  sections: SectionRelateToManyForUpdateInput
   author: UserRelateToOneForUpdateInput
 }
 
@@ -137,6 +147,13 @@ input EventRelateToManyForUpdateInput {
   connect: [EventWhereUniqueInput!]
 }
 
+input SectionRelateToManyForUpdateInput {
+  disconnect: [SectionWhereUniqueInput!]
+  set: [SectionWhereUniqueInput!]
+  create: [SectionCreateInput!]
+  connect: [SectionWhereUniqueInput!]
+}
+
 input UserRelateToOneForUpdateInput {
   create: UserCreateInput
   connect: UserWhereUniqueInput
@@ -154,6 +171,7 @@ input ChapterCreateInput {
   heroImage: ImageFieldInput
   referencedChapter: ChapterRelateToManyForCreateInput
   events: EventRelateToManyForCreateInput
+  sections: SectionRelateToManyForCreateInput
   author: UserRelateToOneForCreateInput
 }
 
@@ -165,6 +183,11 @@ input ChapterRelateToManyForCreateInput {
 input EventRelateToManyForCreateInput {
   create: [EventCreateInput!]
   connect: [EventWhereUniqueInput!]
+}
+
+input SectionRelateToManyForCreateInput {
+  create: [SectionCreateInput!]
+  connect: [SectionWhereUniqueInput!]
 }
 
 input UserRelateToOneForCreateInput {
@@ -596,6 +619,49 @@ input ImageCreateInput {
   author: UserRelateToOneForCreateInput
 }
 
+type Section {
+  id: ID!
+  title: String
+  text: String
+  image: ImageFieldOutput
+}
+
+input SectionWhereUniqueInput {
+  id: ID
+}
+
+input SectionWhereInput {
+  AND: [SectionWhereInput!]
+  OR: [SectionWhereInput!]
+  NOT: [SectionWhereInput!]
+  id: IDFilter
+  title: StringFilter
+  text: StringFilter
+}
+
+input SectionOrderByInput {
+  id: OrderDirection
+  title: OrderDirection
+  text: OrderDirection
+}
+
+input SectionUpdateInput {
+  title: String
+  text: String
+  image: ImageFieldInput
+}
+
+input SectionUpdateArgs {
+  where: SectionWhereUniqueInput!
+  data: SectionUpdateInput!
+}
+
+input SectionCreateInput {
+  title: String
+  text: String
+  image: ImageFieldInput
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -638,6 +704,12 @@ type Mutation {
   updateImages(data: [ImageUpdateArgs!]!): [Image]
   deleteImage(where: ImageWhereUniqueInput!): Image
   deleteImages(where: [ImageWhereUniqueInput!]!): [Image]
+  createSection(data: SectionCreateInput!): Section
+  createSections(data: [SectionCreateInput!]!): [Section]
+  updateSection(where: SectionWhereUniqueInput!, data: SectionUpdateInput!): Section
+  updateSections(data: [SectionUpdateArgs!]!): [Section]
+  deleteSection(where: SectionWhereUniqueInput!): Section
+  deleteSections(where: [SectionWhereUniqueInput!]!): [Section]
   endSession: Boolean!
   authenticateUserWithPassword(name: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -678,6 +750,9 @@ type Query {
   images(where: ImageWhereInput! = {}, orderBy: [ImageOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ImageWhereUniqueInput): [Image!]
   image(where: ImageWhereUniqueInput!): Image
   imagesCount(where: ImageWhereInput! = {}): Int
+  sections(where: SectionWhereInput! = {}, orderBy: [SectionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SectionWhereUniqueInput): [Section!]
+  section(where: SectionWhereUniqueInput!): Section
+  sectionsCount(where: SectionWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }

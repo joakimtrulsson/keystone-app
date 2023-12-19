@@ -56,6 +56,7 @@ export const postSchema = list({
           fieldMode: (args) => (permissions.canManageAllItems(args) ? 'edit' : 'read'),
         },
       },
+
       hooks: {
         resolveInput({ operation, resolvedData, context }) {
           if (operation === 'create' && !resolvedData.author && context.session) {
