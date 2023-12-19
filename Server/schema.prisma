@@ -112,12 +112,27 @@ model Image {
 
 model Section {
   id                    String    @id @default(cuid())
-  title                 String    @default("")
-  text                  String    @default("")
-  image_filesize        Int?
-  image_extension       String?
-  image_width           Int?
-  image_height          Int?
-  image_id              String?
+  relatedLinks          String?
+  faq                   Faq[]     @relation("Section_faq")
+  teaser                Teaser[]  @relation("Section_teaser")
   from_Chapter_sections Chapter[] @relation("Chapter_sections")
+}
+
+model Faq {
+  id               String    @id @default(cuid())
+  question         String    @default("")
+  answer           String    @default("")
+  from_Section_faq Section[] @relation("Section_faq")
+}
+
+model Teaser {
+  id                  String    @id @default(cuid())
+  text                String    @default("")
+  url                 String    @default("")
+  image_filesize      Int?
+  image_extension     String?
+  image_width         Int?
+  image_height        Int?
+  image_id            String?
+  from_Section_teaser Section[] @relation("Section_teaser")
 }

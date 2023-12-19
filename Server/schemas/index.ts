@@ -5,3 +5,5 @@ export { postSchema as Post } from './postSchema';
 export { roleSchema as Role } from './roleSchema';
 export { imageSchema as Image } from './imageSchema';
 export { sectionSchema as Section } from './sectionSchema';
+export { teaserSchema as Teaser } from './teaserSchema';
+export { faqSchema as Faq } from './faqSchema';

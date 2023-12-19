@@ -1,6 +1,6 @@
 import { list } from '@keystone-6/core';
 import { allOperations } from '@keystone-6/core/access';
-import { relationship, text, image } from '@keystone-6/core/fields';
+import { relationship, text, image, json } from '@keystone-6/core/fields';
 // import { document } from '@keystone-6/fields-document';
 
 import { isSignedIn, permissions, rules } from '../access';
@@ -74,6 +74,15 @@ export const chapterSchema = list({
         },
       },
     }),
+
+    // sections: json({
+    //   ui: {
+    //     views: './fields/sections/components',
+    //     createView: { fieldMode: 'edit' },
+    //     listView: { fieldMode: 'hidden' },
+    //     itemView: { fieldMode: 'edit' },
+    //   },
+    // }),
 
     author: relationship({
       ref: 'User.chapters',

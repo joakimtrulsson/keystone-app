@@ -119,6 +119,15 @@ export default withAuth(
         },
         storagePath: 'public/section-images',
       },
+      teaserImages: {
+        kind: 'local',
+        type: 'image',
+        generateUrl: (path) => `${baseUrl}/teaser-images${path}`,
+        serverRoute: {
+          path: '/teaser-images',
+        },
+        storagePath: 'public/teaser-images',
+      },
     },
     ui: {
       isAccessAllowed: ({ session }) => {

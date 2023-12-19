@@ -33,7 +33,7 @@ __export(keystone_exports, {
   default: () => keystone_default
 });
 module.exports = __toCommonJS(keystone_exports);
-var import_core13 = require("@keystone-6/core");
+var import_core15 = require("@keystone-6/core");
 var import_session = require("@keystone-6/core/session");
 var import_auth = require("@keystone-6/auth");
 var import_dotenv = __toESM(require("dotenv"));
@@ -351,6 +351,14 @@ var chapterSchema = (0, import_core3.list)({
         }
       }
     }),
+    // sections: json({
+    //   ui: {
+    //     views: './fields/sections/components',
+    //     createView: { fieldMode: 'edit' },
+    //     listView: { fieldMode: 'hidden' },
+    //     itemView: { fieldMode: 'edit' },
+    //   },
+    // }),
     author: (0, import_fields3.relationship)({
       ref: "User.chapters",
       ui: {
@@ -507,11 +515,11 @@ var useBase = ({
 }) => {
   const [altText, setAltText] = (0, import_react.useState)(imageAlt ?? "");
   const [imageSrc, setImageSrc] = (0, import_react.useState)(defaultValue?.image?.url ?? "");
-  const list8 = (0, import_context.useList)(listKey);
+  const list10 = (0, import_context.useList)(listKey);
   const toasts = (0, import_toast.useToasts)();
   const UPLOAD_IMAGE = import_apollo.gql`
-    mutation ${list8.gqlNames.createMutationName}($file: Upload!) {
-      ${list8.gqlNames.createMutationName}(data: { image: { upload: $file } }) {
+    mutation ${list10.gqlNames.createMutationName}($file: Upload!) {
+      ${list10.gqlNames.createMutationName}(data: { image: { upload: $file } }) {
         id, name, type, image { id, extension, filesize, height, width, url }
       }
     }
@@ -972,9 +980,9 @@ var imageSchema = (0, import_core11.list)({
   },
   hooks: {
     resolveInput: async ({ resolvedData, item }) => {
-      const { name, image: image8 } = resolvedData;
-      const imageId = image8.id ?? item?.image_id;
-      const imageExt = image8.extension ?? item?.image_extension;
+      const { name, image: image10 } = resolvedData;
+      const imageId = image10.id ?? item?.image_id;
+      const imageExt = image10.extension ?? item?.image_extension;
       const origFilename = typeof imageId === "string" ? imageId.split("-").slice(0, -1).join("-") : "unknown";
       const filename = imageId ? `${imageId}.${imageExt}` : null;
       if (name === "") {
@@ -1008,9 +1016,90 @@ var sectionSchema = (0, import_core12.list)({
     }
   },
   fields: {
-    title: (0, import_fields9.text)({ validation: { isRequired: true } }),
-    text: (0, import_fields9.text)({ validation: { isRequired: true } }),
-    image: (0, import_fields9.image)({ storage: "sectionImages" })
+    // title: text({ validation: { isRequired: true } }),
+    // text: text({ validation: { isRequired: true } }),
+    // image: image({ storage: 'sectionImages' }),
+    relatedLinks: (0, import_fields9.json)({
+      ui: {
+        views: "./fields/related-links/components",
+        createView: { fieldMode: "edit" },
+        listView: { fieldMode: "hidden" },
+        itemView: { fieldMode: "edit" }
+      }
+    }),
+    faq: (0, import_fields9.relationship)({
+      ref: "Faq",
+      many: true,
+      ui: {
+        createView: {
+          fieldMode: (args) => permissions.canManageAllItems(args) ? "edit" : "hidden"
+        },
+        itemView: {
+          fieldMode: (args) => permissions.canManageAllItems(args) ? "edit" : "read"
+        }
+      }
+    }),
+    teaser: (0, import_fields9.relationship)({
+      ref: "Teaser",
+      many: true,
+      ui: {
+        createView: {
+          fieldMode: (args) => permissions.canManageAllItems(args) ? "edit" : "hidden"
+        },
+        itemView: {
+          fieldMode: (args) => permissions.canManageAllItems(args) ? "edit" : "read"
+        }
+      }
+    })
+  }
+});
+
+// schemas/teaserSchema.ts
+var import_core13 = require("@keystone-6/core");
+var import_fields10 = require("@keystone-6/core/fields");
+var import_access15 = require("@keystone-6/core/access");
+var teaserSchema = (0, import_core13.list)({
+  access: {
+    operation: {
+      ...(0, import_access15.allOperations)(isSignedIn),
+      create: permissions.canCreateItems,
+      query: () => true
+    },
+    filter: {
+      query: () => true,
+      // query: rules.canReadItems,
+      update: rules.canManageItems,
+      delete: rules.canManageItems
+    }
+  },
+  fields: {
+    text: (0, import_fields10.text)({ validation: { isRequired: true } }),
+    url: (0, import_fields10.text)({ validation: { isRequired: true } }),
+    image: (0, import_fields10.image)({ storage: "teaserImages" })
+  }
+});
+
+// schemas/faqSchema.ts
+var import_core14 = require("@keystone-6/core");
+var import_fields11 = require("@keystone-6/core/fields");
+var import_access17 = require("@keystone-6/core/access");
+var faqSchema = (0, import_core14.list)({
+  access: {
+    operation: {
+      ...(0, import_access17.allOperations)(isSignedIn),
+      create: permissions.canCreateItems,
+      query: () => true
+    },
+    filter: {
+      query: () => true,
+      // query: rules.canReadItems,
+      update: rules.canManageItems,
+      delete: rules.canManageItems
+    }
+  },
+  fields: {
+    question: (0, import_fields11.text)({ validation: { isRequired: true } }),
+    answer: (0, import_fields11.text)({ validation: { isRequired: true } })
   }
 });
 
@@ -1022,7 +1111,9 @@ var lists = {
   User: userSchema,
   Role: roleSchema,
   Image: imageSchema,
-  Section: sectionSchema
+  Section: sectionSchema,
+  Faq: faqSchema,
+  Teaser: teaserSchema
 };
 
 // routes/getEvents.ts
@@ -1098,7 +1189,7 @@ var { withAuth } = (0, import_auth.createAuth)({
     }`
 });
 var keystone_default = withAuth(
-  (0, import_core13.config)({
+  (0, import_core15.config)({
     db: {
       provider: "sqlite",
       url: process.env.DATABASE_URL || "file:./database.db"
@@ -1149,6 +1240,15 @@ var keystone_default = withAuth(
           path: "/section-images"
         },
         storagePath: "public/section-images"
+      },
+      teaserImages: {
+        kind: "local",
+        type: "image",
+        generateUrl: (path) => `${baseUrl}/teaser-images${path}`,
+        serverRoute: {
+          path: "/teaser-images"
+        },
+        storagePath: "public/teaser-images"
       }
     },
     ui: {
