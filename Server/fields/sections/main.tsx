@@ -87,6 +87,18 @@ export const Field = ({
     setSelectedSection(event.target.value);
   };
 
+  const moveSection = (currentIndex: number, direction: 'up' | 'down') => {
+    const sectionsCopy = [...sections];
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+    if (newIndex >= 0 && newIndex < sectionsCopy.length) {
+      const temp = sectionsCopy[currentIndex];
+      sectionsCopy[currentIndex] = sectionsCopy[newIndex];
+      sectionsCopy[newIndex] = temp;
+      onChange(JSON.stringify(sectionsCopy));
+    }
+  };
+
   const onDeleteSection = (index: number) => {
     if (onChange) {
       const sectionsCopy = [...sections];
@@ -147,11 +159,28 @@ export const Field = ({
                   <div>
                     <Button
                       size='small'
+                      className={styles.list.optionButton}
+                      onClick={() => moveSection(i, 'up')}
+                    >
+                      {' '}
+                      &#9650;
+                      {/* <ArrowUpIcon size='small' /> */}
+                    </Button>
+                    <Button
+                      size='small'
+                      className={styles.list.optionButton}
+                      onClick={() => moveSection(i, 'down')}
+                    >
+                      &#9660;
+                      {/* <ArrowDownIcon size='small' /> */}
+                    </Button>
+                    {/* <Button
+                      size='small'
                       onClick={() => onEditSection(i)}
                       className={styles.list.optionButton}
                     >
                       <EditIcon size='small' color='blue' />
-                    </Button>
+                    </Button> */}
                     <Button size='small' className={styles.list.optionButton}>
                       <MinusCircleIcon
                         size='small'
