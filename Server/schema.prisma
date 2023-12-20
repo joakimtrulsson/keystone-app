@@ -22,7 +22,7 @@ model Chapter {
   heroImage_id                   String?
   referencedChapter              Chapter[] @relation("Chapter_referencedChapter")
   events                         Event[]   @relation("Chapter_events")
-  sections                       Section[] @relation("Chapter_sections")
+  sections                       String?
   author                         User?     @relation("Chapter_author", fields: [authorId], references: [id])
   authorId                       String?   @map("author")
   from_Chapter_referencedChapter Chapter[] @relation("Chapter_referencedChapter")
@@ -108,31 +108,4 @@ model Image {
   authorId        String? @map("author")
 
   @@index([authorId])
-}
-
-model Section {
-  id                    String    @id @default(cuid())
-  relatedLinks          String?
-  faq                   Faq[]     @relation("Section_faq")
-  teaser                Teaser[]  @relation("Section_teaser")
-  from_Chapter_sections Chapter[] @relation("Chapter_sections")
-}
-
-model Faq {
-  id               String    @id @default(cuid())
-  question         String    @default("")
-  answer           String    @default("")
-  from_Section_faq Section[] @relation("Section_faq")
-}
-
-model Teaser {
-  id                  String    @id @default(cuid())
-  text                String    @default("")
-  url                 String    @default("")
-  image_filesize      Int?
-  image_extension     String?
-  image_width         Int?
-  image_height        Int?
-  image_id            String?
-  from_Section_teaser Section[] @relation("Section_teaser")
 }

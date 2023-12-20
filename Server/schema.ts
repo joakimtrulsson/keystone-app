@@ -20,7 +20,7 @@ export const lists: Lists<Session> = {
   User,
   Role,
   Image,
-  Section,
-  Faq,
-  Teaser,
+  // Section,
+  // Faq,
+  // Teaser,
 };

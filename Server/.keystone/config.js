@@ -339,26 +339,26 @@ var chapterSchema = (0, import_core3.list)({
         }
       }
     }),
-    sections: (0, import_fields3.relationship)({
-      ref: "Section",
-      many: true,
-      ui: {
-        createView: {
-          fieldMode: (args) => permissions.canManageAllItems(args) ? "edit" : "hidden"
-        },
-        itemView: {
-          fieldMode: (args) => permissions.canManageAllItems(args) ? "edit" : "read"
-        }
-      }
-    }),
-    // sections: json({
+    // sections: relationship({
+    //   ref: 'Section',
+    //   many: true,
     //   ui: {
-    //     views: './fields/sections/components',
-    //     createView: { fieldMode: 'edit' },
-    //     listView: { fieldMode: 'hidden' },
-    //     itemView: { fieldMode: 'edit' },
+    //     createView: {
+    //       fieldMode: (args) => (permissions.canManageAllItems(args) ? 'edit' : 'hidden'),
+    //     },
+    //     itemView: {
+    //       fieldMode: (args) => (permissions.canManageAllItems(args) ? 'edit' : 'read'),
+    //     },
     //   },
     // }),
+    sections: (0, import_fields3.json)({
+      ui: {
+        views: "./fields/sections/main",
+        createView: { fieldMode: "edit" },
+        listView: { fieldMode: "hidden" },
+        itemView: { fieldMode: "edit" }
+      }
+    }),
     author: (0, import_fields3.relationship)({
       ref: "User.chapters",
       ui: {
@@ -1110,10 +1110,10 @@ var lists = {
   Post: postSchema,
   User: userSchema,
   Role: roleSchema,
-  Image: imageSchema,
-  Section: sectionSchema,
-  Faq: faqSchema,
-  Teaser: teaserSchema
+  Image: imageSchema
+  // Section,
+  // Faq,
+  // Teaser,
 };
 
 // routes/getEvents.ts

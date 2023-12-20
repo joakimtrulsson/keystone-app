@@ -1,0 +1,63 @@
+/* FILEPATH: /Users/joakimjonsson/Documents/Skola/Praktik/Projekt/Keystone App/Server/fields/sections/components/styles.css */
+
+/* BEGIN: abpxx6d04wxr */
+.form field {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: 100%;
+  margin: 1rem 0 0 0;
+}
+
+.form label {
+  width: 10%;
+}
+
+.form input {
+  width: 90%;
+}
+/* END: abpxx6d04wxr */
+
+/* BEGIN: be15d9bcejpp */
+button {
+  margin: 1rem 0.5rem 0 0;
+}
+
+.list ul {
+  list-style: none;
+  margin: 1rem 0 0 0;
+  padding: 0;
+}
+
+.list li {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.list li:nth-of-type(2n) > div:nth-of-type(1) {
+  background-color: white;
+}
+
+.list .data {
+  background-color: #eff3f6;
+  padding: 0.5rem;
+  flex: auto;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+}
+
+.list .dataLabel {
+  width: 40%;
+}
+
+.list .dataHref {
+  width: 60%;
+}
+
+.list .optionButton {
+  margin: 0 0 0 0.5rem;
+}
+/* END: be15d9bcejpp */
